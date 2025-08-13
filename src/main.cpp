@@ -1,23 +1,19 @@
-#include <Arduino.h>
 #include <TFT_eSPI.h>
-#include "image.h" // ảnh RGB565 của bạn
+#include <SPI.h>
+#include "image.h"  // file .h bạn gửi (mảng ảnh)
 
 TFT_eSPI tft = TFT_eSPI();
 
 void setup() {
-    Serial.begin(115200);
-    Serial.println("Bắt đầu khởi tạo TFT_eSPI...");
+  tft.init();
+  tft.setRotation(1); // Xoay ngang, đổi số nếu cần
+  tft.fillScreen(TFT_BLACK);
 
-    tft.init();
-    tft.setRotation(1); // xoay ngang
-    tft.fillScreen(TFT_BLACK);
-
-    // Hiển thị ảnh từ file .h
-    tft.pushImage(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, myImage);
-
-    Serial.println("Đã hiển thị ảnh!");
+  // Hiển thị ảnh từ file image.h
+  // Giả sử mảng tên là `myImage` và kích thước 160x80
+  tft.pushImage(0, 0, 160, 80, myImage);
 }
 
 void loop() {
-    // Không làm gì
+  // Không cần làm gì ở đây
 }
