@@ -11,7 +11,7 @@ void setup() {
 
   // Hiển thị ảnh từ file image.h
   // Giả sử mảng tên là `myImage` và kích thước 160x80
-  tft.pushImage(0, 0, 160, 80, myImage);
+  tft.pushImage(0, 0, 160, 80, video01_jpg_frame_0);
 }
 
 void loop() {
