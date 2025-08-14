@@ -7,7 +7,7 @@ typedef struct _VideoInfo {
     uint16_t num_frames;              
 } VideoInfo;
 
-// ======= INCLUDE tất cả video .h ở đây =======
+// ======= INCLUDE tất cả video .h =======
 #include "video01.h"
 #include "video02.h"
 #include "video03.h"
@@ -35,8 +35,8 @@ const uint8_t NUM_VIDEOS = sizeof(videoList) / sizeof(videoList[0]);
 
 TFT_eSPI tft = TFT_eSPI();
 
-// Callback vẽ ảnh
-bool tft_output(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t* bitmap) {
+// Callback vẽ ảnh (kiểu dữ liệu đã sửa chuẩn với TJpg_Decoder)
+bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
     if (x >= tft.width() || y >= tft.height()) return true;  
     tft.pushImage(x, y, w, h, bitmap);
     return true;
@@ -70,7 +70,7 @@ void loop() {
         VideoInfo* currentVideo = videoList[v];
         for (uint16_t f = 0; f < currentVideo->num_frames; f++) {
             drawJPEGFrame(currentVideo, f);
-            delay(20); // Delay giữa các frame
+            delay(30); // Delay giữa các frame
         }
         delay(300); // Delay giữa các video
     }
