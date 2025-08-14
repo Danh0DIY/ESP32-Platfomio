@@ -4,12 +4,12 @@
 #define TFT_WIDTH  80
 #define TFT_HEIGHT 160
 
-#define TFT_CS   22
-#define TFT_DC   21
-#define TFT_RST  19
+#define TFT_CS   5
+#define TFT_DC   1
+#define TFT_RST  8
 
-#define TFT_MOSI 18
-#define TFT_SCLK 5
+#define TFT_MOSI 3
+#define TFT_SCLK 4
 
 #define TFT_RGB_ORDER TFT_BGR     // nếu màu sai, thử đổi sang TFT_RGB
 #define TFT_INVERSION_ON          // hoặc _OFF nếu bị âm
