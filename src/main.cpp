@@ -16,14 +16,11 @@ typedef struct _VideoInfo {
 #include "video06.h"
 #include "video07.h"
 #include "video08.h"
-#include "video09.h"
-#include "video10.h"
 
 // ======= Tự động tạo mảng videoList =======
 VideoInfo* videoList[] = {
     &video01, &video02, &video03, &video04,
-    &video05, &video06, &video07, &video08,
-    &video09, &video10
+    &video05, &video06, &video07, &video08
 };
 
 const uint8_t NUM_VIDEOS = sizeof(videoList) / sizeof(videoList[0]);
