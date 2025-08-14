@@ -17,7 +17,7 @@ typedef struct _VideoInfo {
 #include "video04.h"
 #include "video05.h"
 
-VideoInfo* videoList[] = { &video01, &video02, &video03, &video04 };
+VideoInfo* videoList[] = { &video01, &video02, &video04, &video05 };
 const uint8_t NUM_VIDEOS = sizeof(videoList)/sizeof(videoList[0]);
 
 // ======= TFT & TJpg_Decoder =======
