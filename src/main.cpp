@@ -12,10 +12,21 @@ typedef struct _VideoInfo {
 
 // ======= INCLUDE video =======
 #include "video01.h"
+#include "video02.h"
+#include "video03.h"
+#include "video04.h"
 #include "video05.h"
 #include "video06.h"
+#include "video07.h"
+#include "video08.h"
+#include "video09.h"
+#include "video10.h"
+#include "video11.h"
+#include "video12.h"
+#include "video13.h"
+#include "video14.h"
 
-VideoInfo* videoList[] = { &video01, &video05, &video06 };
+VideoInfo* videoList[] = { &video01, &video02, &video03, &video04, &video05,  &video06, &video07, &video08, &video09, &video10, &video11, &video12, &video13, &video14};
 const uint8_t NUM_VIDEOS = sizeof(videoList)/sizeof(videoList[0]);
 
 TFT_eSPI tft = TFT_eSPI();
