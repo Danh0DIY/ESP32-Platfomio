@@ -142,7 +142,13 @@ size_t uploadedSize = 0;
 
 // ======= Chế độ =======
 enum Mode { VIDEO_PLAY, IMAGE_DISPLAY };
-Mode currentMode = VIDEO_PLAY;
+
+// ======= Biến toàn cục =======
+static uint8_t currentVideo = 0;  // Video hiện tại
+static uint16_t currentFrame = 0; // Khung hình hiện tại
+static Mode currentMode = VIDEO_PLAY; // Chế độ hiện tại
+static unsigned long lastTime = 0; // Thời gian khung hình cuối cùng
+static unsigned long imageDisplayStart = 0; // Thời gian bắt đầu hiển thị ảnh
 
 // ======= Wi-Fi & Web Server =======
 const char* ssid = "ESP32_AP";
@@ -189,6 +195,7 @@ void handleUpload() {
         // Kiểm tra file JPEG hợp lệ
         if (uploadedSize >= 2 && uploadedImage[0] == 0xFF && uploadedImage[1] == 0xD8) {
             currentMode = IMAGE_DISPLAY;
+            imageDisplayStart = millis(); // Bắt đầu đếm thời gian hiển thị ảnh
             server.send(200, "text/html", "<h3>Tải ảnh thành công!</h3><a href='/'>Quay lại</a>");
         } else {
             free(uploadedImage);
@@ -222,7 +229,13 @@ void toggleWiFi() {
         WiFi.mode(WIFI_OFF);
         wifiEnabled = false;
         Serial.println("Wi-Fi đã tắt");
-        tft.fillScreen(TFT_BLACK); // Xóa màn hình để phát video mượt mà
+        if (uploadedImage) {
+            free(uploadedImage);
+            uploadedImage = nullptr;
+            uploadedSize = 0;
+            currentMode = VIDEO_PLAY; // Quay lại chế độ video
+        }
+        tft.fillScreen(TFT_BLACK); // Xóa màn hình
     } else {
         // Bật Wi-Fi và server
         WiFi.softAP(ssid, password);
@@ -277,24 +290,24 @@ void loop() {
     // Xử lý server web nếu Wi-Fi bật
     if (wifiEnabled) {
         static unsigned long lastServerCheck = 0;
-        if (millis() - lastServerCheck >= 10) {
+        if (millis() - lastServerCheck >= 50) { // Tăng lên 50ms để tối ưu
             server.handleClient();
             lastServerCheck = millis();
         }
     }
 
-    static uint8_t currentVideo = 0;
-    static uint16_t currentFrame = 0;
-    static unsigned long lastTime = 0;
-
     if (currentMode == IMAGE_DISPLAY && uploadedImage) {
         TJpgDec.drawJpg(0, 0, uploadedImage, uploadedSize);
+        if (millis() - imageDisplayStart >= 30000) { // Quay lại sau 30 giây
+            currentMode = VIDEO_PLAY;
+            imageDisplayStart = 0;
+        }
         delay(50); // Độ trễ nhỏ để server phản hồi nhanh
         return;
     }
 
     // Phát video
-    if (NUM_VIDEOS > 0 && millis() - lastTime >= 30) {
+    if (currentMode == VIDEO_PLAY && NUM_VIDEOS > 0 && millis() - lastTime >= 30) {
         VideoInfo* currentVideoPtr = videoList[currentVideo];
         unsigned long frameStart = millis();
         drawJPEGFrame(currentVideoPtr, currentFrame);
