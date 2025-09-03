@@ -4,49 +4,41 @@
 const char* ssid = "ESP32_AP";
 const char* password = "12345678";
 
-WiFiUDP udp;
-unsigned int localPort = 4210;   // cổng UDP để nhận dữ liệu
+const char* udpAddress = "192.168.4.1"; // IP mặc định của ESP32 AP
+const int udpPort = 4210;
 
-#define OUTPUT_PIN 5  // chân xuất tín hiệu
+WiFiUDP udp;
+
+long lastRSSI = -100;
+unsigned long lastSend = 0;
 
 void setup() {
   Serial.begin(115200);
-
-  // Tạo Wi-Fi AP
-  WiFi.softAP(ssid, password);
-  Serial.print("WiFi AP dang phat: ");
-  Serial.println(ssid);
-  Serial.print("Dia chi IP: ");
-  Serial.println(WiFi.softAPIP());
-
-  // Bắt đầu UDP server
-  udp.begin(localPort);
-  Serial.printf("Dang lang nghe UDP port %d\n", localPort);
-
-  pinMode(OUTPUT_PIN, OUTPUT);
-  digitalWrite(OUTPUT_PIN, LOW);
+  WiFi.begin(ssid, password);
+  Serial.println("Dang ket noi WiFi...");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nDa ket noi!");
 }
 
 void loop() {
-  int packetSize = udp.parsePacket();
-  if (packetSize) {
-    char incoming[255];
-    int len = udp.read(incoming, 255);
-    if (len > 0) {
-      incoming[len] = '\0';
-    }
-    Serial.print("Nhan du lieu: ");
-    Serial.println(incoming);
+  long rssi = WiFi.RSSI();
+  Serial.print("RSSI: ");
+  Serial.println(rssi);
 
-    int soNguoi = atoi(incoming); // chuyển chuỗi sang số
-    if (soNguoi > 0) {
-      Serial.printf("Xuat %d xung ra chan %d\n", soNguoi, OUTPUT_PIN);
-      for (int i = 0; i < soNguoi; i++) {
-        digitalWrite(OUTPUT_PIN, HIGH);
-        delay(200);
-        digitalWrite(OUTPUT_PIN, LOW);
-        delay(200);
-      }
-    }
+  int diff = abs(rssi - lastRSSI);
+
+  // Ngưỡng dao động RSSI để coi là có người đi qua
+  if (diff > 6 && millis() - lastSend > 1000) {
+    Serial.println("⚠️ Phat hien 1 nguoi di qua");
+    udp.beginPacket(udpAddress, udpPort);
+    udp.print("1");  // gửi "1" = phát hiện 1 người
+    udp.endPacket();
+    lastSend = millis();
   }
+
+  lastRSSI = rssi;
+  delay(200);
 }
