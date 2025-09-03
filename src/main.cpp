@@ -1,20 +1,21 @@
 #include <WiFi.h>
 
-const char* ssid = "ESP32_AP";
-const char* password = "12345678";
+const char* ssid     = "Ten_WiFi_Nha_Ban";   // đổi thành Wi-Fi nhà bạn
+const char* password = "Mat_khau_WiFi";      // đổi mật khẩu cho đúng
 
-#define LED_PIN 8   // GPIO 8
+#define OUT_PIN 5   // Chân xuất tín hiệu
 
 long lastRSSI = -100;
 unsigned long lastTrigger = 0;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  pinMode(OUT_PIN, OUTPUT);
+  digitalWrite(OUT_PIN, LOW);
 
+  // Kết nối Wi-Fi
   WiFi.begin(ssid, password);
-  Serial.println("Dang ket noi WiFi...");
+  Serial.print("Dang ket noi WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -29,13 +30,14 @@ void loop() {
 
   int diff = abs(rssi - lastRSSI);
 
-  // Ngưỡng dao động RSSI để coi là có người đi qua
+  // Nếu dao động lớn hơn ngưỡng => coi như có người đi qua
   if (diff > 6 && millis() - lastTrigger > 1000) {
-    Serial.println("⚠️ Phat hien 1 nguoi di qua");
-    // Nhấp nháy LED = 1 nhịp
-    digitalWrite(LED_PIN, HIGH);
+    Serial.println("⚠️ Phat hien nguoi di qua!");
+    
+    // Xuất 1 nhịp ra GPIO 5
+    digitalWrite(OUT_PIN, HIGH);
     delay(200);
-    digitalWrite(LED_PIN, LOW);
+    digitalWrite(OUT_PIN, LOW);
     delay(200);
 
     lastTrigger = millis();
