@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #define BUZZER_PIN 25  // Chân nối loa/còi thụ động
 
 // Bảng tần số các nốt nhạc piano (C4 = Đô trung)
