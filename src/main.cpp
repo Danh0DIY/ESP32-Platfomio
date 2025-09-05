@@ -1,59 +1,53 @@
-#include <Arduino.h>
+#include "BluetoothA2DPSource.h"
 
-#define BUZZER_PIN 25  // Chân nối loa/còi
+BluetoothA2DPSource a2dp_source;
 
-// Định nghĩa một số nốt cơ bản (C4–C5)
-#define NOTE_C4  262
-#define NOTE_CS4 277
-#define NOTE_D4  294
-#define NOTE_DS4 311
-#define NOTE_E4  330
-#define NOTE_F4  349
-#define NOTE_FS4 370
-#define NOTE_G4  392
-#define NOTE_GS4 415
-#define NOTE_A4  440
-#define NOTE_AS4 466
-#define NOTE_B4  494
-#define NOTE_C5  523
-#define NOTE_D5  587
-#define NOTE_E5  659
-#define NOTE_F5  698
-#define NOTE_G5  784
-#define NOTE_A5  880
+// Tần số các nốt nhạc (Hz)
+const int NOTE_C = 262;
+const int NOTE_D = 294;
+const int NOTE_E = 330;
+const int NOTE_F = 349;
 
-// Happy Birthday (nốt + nhịp)
-int melody[] = {
-  NOTE_C4, NOTE_C4, NOTE_D4, NOTE_C4, NOTE_F4, NOTE_E4,
-  NOTE_C4, NOTE_C4, NOTE_D4, NOTE_C4, NOTE_G4, NOTE_F4,
-  NOTE_C4, NOTE_C4, NOTE_C5, NOTE_A4, NOTE_F4, NOTE_E4, NOTE_D4,
-  NOTE_AS4, NOTE_AS4, NOTE_A4, NOTE_F4, NOTE_G4, NOTE_F4
-};
+int note_frequency = 0;  // nốt hiện tại
+int phase = 0;
 
-// thời lượng: 4 = nốt đen, 8 = móc đơn, 2 = nốt trắng
-int noteDurations[] = {
-  4, 8, 4, 4, 4, 2,
-  4, 8, 4, 4, 4, 2,
-  4, 8, 4, 4, 4, 4, 2,
-  4, 8, 4, 4, 4, 2
-};
+int touchPin = T5; // GPIO33
+
+// Hàm phát sóng sin
+int32_t get_data(Frame* frame, int32_t frame_count) {
+  if (note_frequency == 0) {
+    for (int i = 0; i < frame_count; i++) {
+      frame[i].channel1 = 0;
+      frame[i].channel2 = 0;
+    }
+    return frame_count;
+  }
+
+  float step = (2 * M_PI * note_frequency) / 44100.0; // lấy mẫu 44.1kHz
+  for (int i = 0; i < frame_count; i++) {
+    int16_t sample = (int16_t)(3000 * sin(phase * step));
+    frame[i].channel1 = sample;
+    frame[i].channel2 = sample;
+    phase++;
+  }
+  return frame_count;
+}
 
 void setup() {
-  ledcAttachPin(BUZZER_PIN, 0); // gán chân vào kênh PWM 0
+  Serial.begin(115200);
+  a2dp_source.start("ESP32-Piano", get_data); // kết nối loa bluetooth
 }
 
 void loop() {
-  int notes = sizeof(melody) / sizeof(melody[0]);
+  int touchVal = touchRead(touchPin);
+  Serial.println(touchVal);
 
-  for (int thisNote = 0; thisNote < notes; thisNote++) {
-    int noteDuration = 1000 / noteDurations[thisNote];
-    ledcWriteTone(0, melody[thisNote]);  // phát nốt
-    delay(noteDuration);
+  // Chia giá trị cảm ứng ra các nốt
+  if (touchVal < 20)       note_frequency = NOTE_C;  // Đô
+  else if (touchVal < 40)  note_frequency = NOTE_D;  // Rê
+  else if (touchVal < 60)  note_frequency = NOTE_E;  // Mi
+  else if (touchVal < 80)  note_frequency = NOTE_F;  // Pha
+  else                     note_frequency = 0;       // không chạm → im lặng
 
-    // nghỉ giữa các nốt
-    ledcWriteTone(0, 0);
-    delay(50);
-  }
-
-  delay(3000); // nghỉ 3 giây rồi lặp lại
+  delay(50);
 }
