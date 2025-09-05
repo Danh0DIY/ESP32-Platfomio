@@ -4,10 +4,10 @@
 BluetoothA2DPSource a2dp_source;
 
 // Tần số các nốt nhạc (Hz)
-const int NOTE_C = 262;
-const int NOTE_D = 294;
-const int NOTE_E = 330;
-const int NOTE_F = 349;
+const int NOTE_Cc = 262;
+const int NOTE_Dd = 294;
+const int NOTE_Ee = 330;
+const int NOTE_Ff = 349;
 
 int note_frequency = 0;  // nốt hiện tại
 int phase = 0;
@@ -44,10 +44,10 @@ void loop() {
   Serial.println(touchVal);
 
   // Chia giá trị cảm ứng ra các nốt
-  if (touchVal < 20)       note_frequency = NOTE_C;  // Đô
-  else if (touchVal < 40)  note_frequency = NOTE_D;  // Rê
-  else if (touchVal < 60)  note_frequency = NOTE_E;  // Mi
-  else if (touchVal < 80)  note_frequency = NOTE_F;  // Pha
+  if (touchVal < 20)       note_frequency = NOTE_Cc;  // Đô
+  else if (touchVal < 40)  note_frequency = NOTE_Dd;  // Rê
+  else if (touchVal < 60)  note_frequency = NOTE_Ee;  // Mi
+  else if (touchVal < 80)  note_frequency = NOTE_Ff;  // Pha
   else                     note_frequency = 0;       // không chạm → im lặng
 
   delay(50);
