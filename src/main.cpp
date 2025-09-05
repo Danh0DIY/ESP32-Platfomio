@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "BluetoothA2DPSource.h"
 
 BluetoothA2DPSource a2dp_source;
