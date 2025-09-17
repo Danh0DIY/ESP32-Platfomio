@@ -1,17 +1,13 @@
-#define ST7735_DRIVER
-#define ST7735_GREENTAB160x80  // chuẩn cho màn hình 160x80 ST7735S
+// Chọn driver
+#define ST7789_DRIVER
 
-#define TFT_WIDTH  80
-#define TFT_HEIGHT 160
+// Độ phân giải màn hình
+#define TFT_WIDTH  240
+#define TFT_HEIGHT 240
 
-#define TFT_CS   5
-#define TFT_DC   1
-#define TFT_RST  8
-
-#define TFT_MOSI 3
-#define TFT_SCLK 4
-
-#define TFT_RGB_ORDER TFT_BGR     // nếu màu sai, thử đổi sang TFT_RGB
-#define TFT_INVERSION_ON          // hoặc _OFF nếu bị âm
-
-#define SPI_FREQUENCY  27000000
+// Chân SPI cho ESP32 DevKit V1
+#define TFT_MOSI 18
+#define TFT_SCLK 5
+#define TFT_CS   23   // Chip select
+#define TFT_DC   22   // Data/Command
+#define TFT_RST  19   // Reset
