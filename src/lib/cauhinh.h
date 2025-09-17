@@ -11,3 +11,6 @@
 #define TFT_CS   23   // Chip select
 #define TFT_DC   22   // Data/Command
 #define TFT_RST  19   // Reset
+
+#define LOAD_GLCD
+#define LOAD_FONT2
