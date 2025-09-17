@@ -14,8 +14,6 @@ void setup() {
   // In chữ
   tft.setTextColor(TFT_GREEN, TFT_BLACK);
   tft.setTextSize(2);
-  tft.setCursor(20, 30);
-  tft.println("Xin chao ESP32!, du dit con me may, dit gai xinh mup");
 
   // Vẽ hình chữ nhật
   tft.fillRect(1,1,238,78, TFT_BLUE);
@@ -23,6 +21,14 @@ void setup() {
   tft.fillRect(1,162,238,78, TFT_BLUE);
   // Vẽ hình tròn
   tft.fillCircle(120, 120, 40, TFT_BLUE);
+  
+  //chữ
+  
+  
+  tft.drawCentreString("Gai lon hong",120,42,2);
+  tft.drawCentreString("Dit gai xinh",120,122,2);
+  tft.drawCentreString("Dit gai nga",120,202,2);
+  
 }
 
 void loop() {
