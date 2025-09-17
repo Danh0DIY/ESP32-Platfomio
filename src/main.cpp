@@ -18,14 +18,13 @@ void setup() {
   tft.println("Xin chao ESP32!, du dit con me may, dit gai xinh mup");
 
   // Vẽ hình chữ nhật
-  tft.fillRect(50, 100, 100, 100, TFT_RED);
-
+  tft.fillRect(1,1,238,78, TFT_BLUE);
+  tft.fillRect(1,82,238,78, TFT_BLUE);
+  tft.fillRect(1,162,238,78, TFT_BLUE);
   // Vẽ hình tròn
   tft.fillCircle(120, 120, 40, TFT_BLUE);
 }
 
 void loop() {
-  // Đổi màu màn hình liên tục
-  tft.fillScreen(random(0xFFFF));
-  delay(1000);
+
 }
