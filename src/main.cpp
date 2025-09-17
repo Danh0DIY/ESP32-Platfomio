@@ -15,7 +15,7 @@ void setup() {
   tft.setTextColor(TFT_GREEN, TFT_BLACK);
   tft.setTextSize(2);
   tft.setCursor(20, 30);
-  tft.println("Xin chao ESP32!");
+  tft.println("Xin chao ESP32!, du dit con me may, dit gai xinh mup");
 
   // Vẽ hình chữ nhật
   tft.fillRect(50, 100, 100, 100, TFT_RED);
