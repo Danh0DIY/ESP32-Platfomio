@@ -1,51 +1,31 @@
-#include <Arduino.h>
+#include <TFT_eSPI.h> 
 #include <SPI.h>
-#include <SD.h>
 
-#define SD_CS 5   // chân CS (ESP32 thường dùng GPIO 5)
-
-void listDir(fs::FS &fs, const char * dirname, uint8_t levels) {
-  Serial.printf("📂 Liệt kê thư mục: %s\n", dirname);
-
-  File root = fs.open(dirname);
-  if (!root) {
-    Serial.println("❌ Không mở được thư mục");
-    return;
-  }
-  if (!root.isDirectory()) {
-    Serial.println("❌ Không phải thư mục");
-    return;
-  }
-
-  File file = root.openNextFile();
-  while (file) {
-    if (file.isDirectory()) {
-      Serial.print("   📁 ");
-      Serial.println(file.name());
-      if (levels) {
-        listDir(fs, file.name(), levels - 1);
-      }
-    } else {
-      Serial.print("   📄 ");
-      Serial.print(file.name());
-      Serial.print("  (");
-      Serial.print(file.size());
-      Serial.println(" bytes)");
-    }
-    file = root.openNextFile();
-  }
-}
+TFT_eSPI tft = TFT_eSPI();  // Khởi tạo TFT
 
 void setup() {
   Serial.begin(115200);
-  if (!SD.begin(SD_CS)) {
-    Serial.println("⚠ Không khởi động được thẻ nhớ!");
-    return;
-  }
-  Serial.println("✅ Đã khởi động thẻ nhớ thành công.");
+  tft.init();
+  tft.setRotation(0);  // Xoay màn hình 0-3
 
-  // Liệt kê toàn bộ file/thư mục trong root
-  listDir(SD, "/", 2);  // levels = 2 nghĩa là lặp tối đa 2 cấp thư mục
+  // Xóa màn hình
+  tft.fillScreen(TFT_BLACK);
+
+  // In chữ
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.setTextSize(2);
+  tft.setCursor(20, 30);
+  tft.println("Xin chao ESP32!");
+
+  // Vẽ hình chữ nhật
+  tft.fillRect(50, 100, 100, 100, TFT_RED);
+
+  // Vẽ hình tròn
+  tft.fillCircle(120, 120, 40, TFT_BLUE);
 }
 
-void loop() {}
+void loop() {
+  // Đổi màu màn hình liên tục
+  tft.fillScreen(random(0xFFFF));
+  delay(1000);
+}
