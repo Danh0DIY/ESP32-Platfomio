@@ -118,7 +118,7 @@ void setup() {
   // Khởi tạo SPI cho SD card
   spiSD.begin(SD_CLK, SD_MISO, SD_MOSI, SD_CS);
 
-  if (!SD.begin(SD_CS, spiSD, 25000000)) {
+  if (!SD.begin(SD_CS, spiSD, 15000000)) {
     Serial.println("SD Card FAIL!");
     tft.setTextColor(TFT_RED, TFT_BLACK);
     tft.setCursor(10, 10);
