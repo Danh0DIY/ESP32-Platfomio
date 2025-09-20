@@ -13,7 +13,7 @@ void setup() {
 
   if (!SD.begin(SD_CS, spiSD, 15000000)) {
     Serial.println("SD FAIL!");
-    return;
+    
   }
 
   Serial.println("SD OK! Liệt kê file root:");
@@ -21,12 +21,12 @@ void setup() {
   File root = SD.open("/");
   if(!root){
     Serial.println("Không mở được thư mục root!");
-    return;
+    
   }
 
   if(!root.isDirectory()){
     Serial.println("Root không phải thư mục!");
-    return;
+    
   }
 
   File entry;
