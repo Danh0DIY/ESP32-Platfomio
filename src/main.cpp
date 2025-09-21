@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "driver/temperature_sensor.h"
 #include <WiFi.h>
 
