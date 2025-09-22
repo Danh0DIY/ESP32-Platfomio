@@ -3,7 +3,7 @@
 #define TFT_WIDTH  240
 #define TFT_HEIGHT 240
 
-#define TFT_MOSI 13
+#define TFT_MOSI 23
 #define TFT_SCLK 18
 #define TFT_CS   22
 #define TFT_DC   21
