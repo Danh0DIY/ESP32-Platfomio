@@ -4,11 +4,11 @@
 #define TFT_HEIGHT 240
 
 #define TFT_MOSI 13
-#define TFT_SCLK 14
-#define TFT_CS   21
-#define TFT_DC   19
-#define TFT_RST  18
-#define TFT_BL   26
+#define TFT_SCLK 18
+#define TFT_CS   22
+#define TFT_DC   21
+#define TFT_RST  19
+#define TFT_BL   32
 
 #define LOAD_GLCD
 #define LOAD_FONT2
