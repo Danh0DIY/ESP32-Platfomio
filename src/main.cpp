@@ -1,22 +1,20 @@
 #include <Arduino.h>
-#include <TFT_eSPI.h>  // Thư viện màn hình TFT
+#include <TFT_eSPI.h>  // Thư viện TFT
 
-// Cấu hình chân
-const int micPin = 34;  // MAX9814 OUT
-TFT_eSPI tft = TFT_eSPI(); // Khởi tạo TFT
+const int micPin = 34;
+TFT_eSPI tft = TFT_eSPI();
 
-// Biến vẽ sóng
-int prevY = 0;
 int tftWidth, tftHeight;
+int prevY = 0;
+int x = 0;  // Vị trí vẽ hiện tại
 
 void setup() {
   Serial.begin(115200);
   analogReadResolution(12);
   analogSetAttenuation(ADC_11db);
 
-  // Khởi tạo TFT
   tft.init();
-  tft.setRotation(1); // Ngang
+  tft.setRotation(0);
   tft.fillScreen(TFT_BLACK);
 
   tftWidth = tft.width();
@@ -25,18 +23,20 @@ void setup() {
 }
 
 void loop() {
-  int micValue = analogRead(micPin); // Đọc tín hiệu mic (0-4095)
+  int micValue = analogRead(micPin);
   Serial.println(micValue);
 
-  // Chuyển giá trị ADC sang pixel TFT (dọc)
   int y = map(micValue, 0, 4095, tftHeight, 0);
 
-  // Vẽ đường nối sóng âm
-  tft.drawLine(tftWidth - 2, prevY, tftWidth - 1, y, TFT_GREEN);
+  // Xoá cột pixel trước khi vẽ tiếp
+  tft.drawLine(x, 0, x, tftHeight, TFT_BLACK);
+
+  // Vẽ sóng âm
+  tft.drawLine(x, prevY, x, y, TFT_GREEN);
   prevY = y;
 
-  // Dịch màn hình sang trái
-  tft.scroll(-1, 0);
+  x++;
+  if (x >= tftWidth) x = 0;  // Quay lại đầu màn hình
 
-  delay(5); // Tốc độ vẽ
+  delay(5);
 }
