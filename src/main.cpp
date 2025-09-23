@@ -1,3 +1,4 @@
+#include <Arduino.h>
 // MAX9814 Test với ESP32
 const int micPin = 34;  // Chân OUT của MAX9814
 
