@@ -1,49 +1,26 @@
 #include <Arduino.h>
-#include "BluetoothA2DPSource.h"
+#include "BluetoothA2DPSink.h"
 
-BluetoothA2DPSource a2dp_source;
+BluetoothA2DPSink a2dp_sink;
 
-const int micPin = 34;   // Mic analog (MAX9814 OUT)
-int16_t sample_buffer[256];
-
-// Hàm lấy dữ liệu từ mic để gửi sang loa
-int32_t get_audio_data(Frame* data, int32_t frameCount) {
-  for (int i = 0; i < frameCount; i++) {
-    int micValue = analogRead(micPin);              // đọc ADC 0–4095
-    int16_t sample = map(micValue, 0, 4095, -32768, 32767);
-    data[i].channel1 = sample;   // kênh trái
-    data[i].channel2 = sample;   // kênh phải
-  }
-  return frameCount;
-}
+// Cấu hình chân I2S cho MAX98357A
+i2s_pin_config_t i2s_cfg = {
+    .bck_io_num = 14,   // BCLK
+    .ws_io_num = 25,    // LRC
+    .data_out_num = 27, // DIN
+    .data_in_num = I2S_PIN_NO_CHANGE
+};
 
 void setup() {
   Serial.begin(115200);
-  analogReadResolution(12);
 
-  Serial.println("Đang scan loa Bluetooth...");
+  // Đặt tên cho thiết bị Bluetooth (hiện trên điện thoại)
+  a2dp_sink.set_pin_config(i2s_cfg);
+  a2dp_sink.start("ESP32 Loa Bluetooth");
 
-  // Tìm thiết bị Bluetooth khả dụng
-  std::vector<BluetoothA2DPSource::BluetoothDevice> devices = a2dp_source.discover();
-
-  if (devices.size() == 0) {
-    Serial.println("Không tìm thấy loa nào!");
-    return;
-  }
-
-  // In ra danh sách để biết MAC
-  for (int i = 0; i < devices.size(); i++) {
-    Serial.printf("[%d] %s - %s\n", i, devices[i].name.c_str(), devices[i].address.toString().c_str());
-  }
-
-  // Ở đây chọn thiết bị đầu tiên
-  auto target = devices[0];
-  Serial.printf("Kết nối tới: %s (%s)\n", target.name.c_str(), target.address.toString().c_str());
-
-  // Bắt đầu stream mic → loa
-  a2dp_source.start(target.name.c_str(), get_audio_data, target.address.toString().c_str());
+  Serial.println("ESP32 đã bật chế độ Loa Bluetooth, hãy kết nối từ điện thoại!");
 }
 
 void loop() {
-  // Không cần thêm code ở loop
+  // Không cần gì thêm, thư viện xử lý hết
 }
