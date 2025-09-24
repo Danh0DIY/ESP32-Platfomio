@@ -1,72 +1,65 @@
 #include <Arduino.h>
-#include <driver/i2s.h>
+#include <TFT_eSPI.h>
+#include "BluetoothA2DPSource.h"
 
-#define I2S_SAMPLE_RATE   8000     // 8kHz
-#define I2S_SAMPLE_BITS   16
-#define MIC_PIN           34
-#define RECORD_TIME       5        // số giây ghi âm
-#define BUFFER_SIZE       (I2S_SAMPLE_RATE * RECORD_TIME)
+#define MIC_PIN 34
 
-#define I2S_BCLK  14
-#define I2S_LRC   25
-#define I2S_DOUT  27
+TFT_eSPI tft = TFT_eSPI();
+BluetoothA2DPSource a2dp_source;
 
-int16_t audioBuffer[BUFFER_SIZE];  // Lưu dữ liệu âm thanh
+int tftWidth, tftHeight;
+int prevY = 0;
+int x = 0;
 
-// Cấu hình I2S cho phát
-void i2s_config() {
-  const i2s_config_t i2s_config = {
-    .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
-    .sample_rate = I2S_SAMPLE_RATE,
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-    .communication_format = I2S_COMM_FORMAT_I2S_MSB,
-    .intr_alloc_flags = 0,
-    .dma_buf_count = 4,
-    .dma_buf_len = 512,
-    .use_apll = false,
-    .tx_desc_auto_clear = true
-  };
+// Callback cho A2DP (phát ra loa Bluetooth)
+int32_t get_audio_data(Frame* frame, int32_t frame_count) {
+  for (int i = 0; i < frame_count; i++) {
+    int adcValue = analogRead(MIC_PIN) - 2048;  // bỏ offset
+    int16_t sample = adcValue * 16;             // khuếch đại -> 16-bit
 
-  const i2s_pin_config_t pin_config = {
-    .bck_io_num = I2S_BCLK,
-    .ws_io_num = I2S_LRC,
-    .data_out_num = I2S_DOUT,
-    .data_in_num = I2S_PIN_NO_CHANGE
-  };
-
-  i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
-  i2s_set_pin(I2S_NUM_0, &pin_config);
-  i2s_zero_dma_buffer(I2S_NUM_0);
+    frame[i].channel1 = sample;  // kênh trái
+    frame[i].channel2 = sample;  // kênh phải
+  }
+  return frame_count;
 }
 
 void setup() {
   Serial.begin(115200);
+
+  // Mic
   analogReadResolution(12);
   analogSetAttenuation(ADC_11db);
-  i2s_config();
-  Serial.println("Sẵn sàng ghi âm...");
+
+  // Màn hình
+  tft.init();
+  tft.setRotation(1);
+  tft.fillScreen(TFT_BLACK);
+  tftWidth = tft.width();
+  tftHeight = tft.height();
+  prevY = tftHeight / 2;
+
+  // Bluetooth A2DP Source
+  a2dp_source.start("Tên_loa_Bluetooth", get_audio_data);  
 }
 
 void loop() {
-  // --- Ghi âm ---
-  Serial.println("Bắt đầu ghi...");
-  for (int i = 0; i < BUFFER_SIZE; i++) {
-    int adcValue = analogRead(MIC_PIN) - 2048;  // bỏ offset
-    audioBuffer[i] = adcValue * 16;             // chuyển sang 16-bit, khuếch đại
-    delayMicroseconds(1000000 / I2S_SAMPLE_RATE);
-  }
-  Serial.println("Ghi âm xong!");
+  // Đọc giá trị mic để hiển thị sóng
+  int micValue = analogRead(MIC_PIN);
+  int centered = micValue - 2048;       // lấy dao động quanh mức giữa
+  int y = (tftHeight / 2) - centered / 20;
 
-  delay(1000);
+  if (y < 0) y = 0;
+  if (y > tftHeight - 1) y = tftHeight - 1;
 
-  // --- Phát lại ---
-  Serial.println("Phát lại...");
-  size_t bytes_written;
-  for (int i = 0; i < BUFFER_SIZE; i++) {
-    i2s_write(I2S_NUM_0, (const char*)&audioBuffer[i], sizeof(int16_t), &bytes_written, portMAX_DELAY);
-  }
-  Serial.println("Phát xong!");
+  // Xóa cột trước
+  tft.drawLine(x, 0, x, tftHeight, TFT_BLACK);
 
-  delay(3000); // chờ rồi ghi lại vòng tiếp
+  // Vẽ sóng âm
+  tft.drawLine(x, prevY, x, y, TFT_GREEN);
+  prevY = y;
+
+  x++;
+  if (x >= tftWidth) x = 0;
+
+  delay(5);
 }
