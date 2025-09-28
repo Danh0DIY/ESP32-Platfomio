@@ -1,48 +1,54 @@
+#include <WiFi.h>
 #include <TFT_eSPI.h>
-#include <SPI.h>
-#include "Fontchu_vn.c"   // font tiếng Việt mày vừa tạo (đặt trong thư mục src hoặc include)
 
-// Khởi tạo TFT
+// --- Cấu hình TFT ---
 TFT_eSPI tft = TFT_eSPI();
+const int screenWidth = 240;
+const int screenHeight = 240;
+
+// --- Cấu hình Wi-Fi ---
+const char* staSSID = "danh";      // Wi-Fi muốn kết nối
+const char* staPassword = "1234567899";
+
+const char* apSSID = "ESP32_AP";       // Wi-Fi phát ra
+const char* apPassword = "12345678";   // Mật khẩu AP
 
 void setup() {
-  // Khởi tạo màn hình
+  Serial.begin(115200);
+
+  // TFT init
   tft.init();
-  tft.setRotation(0);   // 0: dọc, 1: ngang, 2: dọc ngược, 3: ngang ngược
+  tft.setRotation(0);
   tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE);
+  tft.setTextSize(3);
+  tft.drawString("ESP32 WiFi Demo", 10, 10);
 
-  // Chọn màu chữ: trắng, nền: đen
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  // --- Khởi động Wi-Fi Station ---
+  WiFi.mode(WIFI_AP_STA);  // Vừa STA vừa AP
+  WiFi.begin(staSSID, staPassword);
+  tft.drawString("Connecting to WiFi...", 10, 40);
 
-  // Load font tiếng Việt
-  tft.setFreeFont(&Fontchu_vn);
-
-  // Hiển thị thử
-  tft.setCursor(10, 40);
-  tft.println("Xin chao ESP32 + ST7789!");
-
-  tft.setCursor(10, 80);
-  tft.println("Tieng Viet co dau:");
-
-  tft.setCursor(10, 120);
-  tft.println("ă â ê ô ơ ư đ");
-
-  tft.setCursor(10, 160);
-  tft.println("À Á Ả Ã Ạ Ầ Ấ Ẩ Ẫ Ậ");
-
-  tft.setCursor(10, 200);
-  tft.println("È É Ẻ Ẽ Ẹ Ề Ế Ể Ễ Ệ");
-
-  tft.setCursor(10, 240);
-  tft.println("Ò Ó Ỏ Õ Ọ Ờ Ớ Ở Ỡ Ợ");
-
-  tft.setCursor(10, 280);
-  tft.println("Ù Ú Ủ Ũ Ụ Ừ Ứ Ử Ữ Ự");
-
-  tft.setCursor(10, 320);
-  tft.println("Ỳ Ý Ỷ Ÿ Ỵ");
+  // --- Khởi động AP ---
+  WiFi.softAP(apSSID, apPassword);
+  tft.drawString("AP Started: " + String(apSSID), 10, 70);
 }
 
 void loop() {
-  // không cần làm gì thêm
+  // Kiểm tra trạng thái Wi-Fi STA
+  if (WiFi.status() == WL_CONNECTED) {
+    String ip = WiFi.localIP().toString();
+    tft.fillRect(0, 100, screenWidth, 20, TFT_BLACK);
+    tft.drawString("STA IP: " + ip, 10, 100);
+  } else {
+    tft.fillRect(0, 100, screenWidth, 20, TFT_BLACK);
+    tft.drawString("Connecting...", 10, 100);
+  }
+
+  // Hiển thị số lượng client kết nối AP
+  int clients = WiFi.softAPgetStationNum();
+  tft.fillRect(0, 130, screenWidth, 20, TFT_BLACK);
+  tft.drawString("AP Clients: " + String(clients), 10, 130);
+
+  delay(1000); // Cập nhật mỗi giây
 }
