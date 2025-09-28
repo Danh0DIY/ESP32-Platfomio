@@ -15,7 +15,7 @@ void setup() {
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
   // Load font tiếng Việt
-  tft.setFreeFont(&Font_vn20pt);
+  tft.setFreeFont(&Fontchu_vn);
 
   // Hiển thị thử
   tft.setCursor(10, 40);
