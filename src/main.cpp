@@ -1,83 +1,48 @@
-#include <WiFi.h>
-#include <HTTPClient.h>
 #include <TFT_eSPI.h>
+#include <SPI.h>
+#include "Fontchu_vn.c"   // font tiếng Việt mày vừa tạo (đặt trong thư mục src hoặc include)
 
-const char* ssid     = "danh";
-const char* password = "1234567899";
-
+// Khởi tạo TFT
 TFT_eSPI tft = TFT_eSPI();
 
-// Hàm lọc bỏ thẻ HTML
-String stripHTML(const String &html) {
-  String text = "";
-  bool insideTag = false;
-
-  for (int i = 0; i < html.length(); i++) {
-    char c = html[i];
-    if (c == '<') {
-      insideTag = true;
-      continue;
-    }
-    if (c == '>') {
-      insideTag = false;
-      continue;
-    }
-    if (!insideTag) {
-      text += c;
-    }
-  }
-  return text;
-}
-
 void setup() {
-  Serial.begin(115200);
-
   // Khởi tạo màn hình
   tft.init();
-  tft.setRotation(0);
+  tft.setRotation(0);   // 0: dọc, 1: ngang, 2: dọc ngược, 3: ngang ngược
   tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_GREEN, TFT_BLACK);
-  tft.setTextSize(1);
 
-  // Kết nối WiFi
-  tft.println("Connecting WiFi...");
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    tft.print(".");
-  }
-  tft.println("\nWiFi connected!");
-  delay(500);
+  // Chọn màu chữ: trắng, nền: đen
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
-  // Gửi HTTP GET
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin("https://vnexpress.net/doc-truyen-online-doc-truyen-tranh-online-app-doc-truyen-online-em-trai-toi-bi-tay-nao-tu-mot-app-doc-truyen-mien-phi-4923289.html");   // Trang test
-    int httpCode = http.GET();
+  // Load font tiếng Việt
+  tft.setFreeFont(&Font_vn20pt);
 
-    if (httpCode > 0) {
-      String payload = http.getString();
-      Serial.println(payload);
+  // Hiển thị thử
+  tft.setCursor(10, 40);
+  tft.println("Xin chao ESP32 + ST7789!");
 
-      // Lọc bỏ HTML
-      String cleanText = stripHTML(payload);
+  tft.setCursor(10, 80);
+  tft.println("Tieng Viet co dau:");
 
-      tft.fillScreen(TFT_BLACK);
-      tft.setCursor(0, 0);
+  tft.setCursor(10, 120);
+  tft.println("ă â ê ô ơ ư đ");
 
-      // In khoảng 200 ký tự đầu ra màn hình
-      for (int i = 0; i < cleanText.length() && i < 200; i++) {
-        char c = cleanText[i];
-        if (c == '\n' || c == '\r') continue; // bỏ newline
-        tft.print(c);
-      }
-    } else {
-      tft.println("HTTP request failed!");
-    }
-    http.end();
-  }
+  tft.setCursor(10, 160);
+  tft.println("À Á Ả Ã Ạ Ầ Ấ Ẩ Ẫ Ậ");
+
+  tft.setCursor(10, 200);
+  tft.println("È É Ẻ Ẽ Ẹ Ề Ế Ể Ễ Ệ");
+
+  tft.setCursor(10, 240);
+  tft.println("Ò Ó Ỏ Õ Ọ Ờ Ớ Ở Ỡ Ợ");
+
+  tft.setCursor(10, 280);
+  tft.println("Ù Ú Ủ Ũ Ụ Ừ Ứ Ử Ữ Ự");
+
+  tft.setCursor(10, 320);
+  tft.println("Ỳ Ý Ỷ Ÿ Ỵ");
 }
 
 void loop() {
-  // Không làm gì thêm
+  // không cần làm gì thêm
 }
