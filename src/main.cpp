@@ -19,10 +19,10 @@ void setup() {
   // TFT init
   tft.init();
   tft.setRotation(0);
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(TFT_BLUE);
   tft.setTextColor(TFT_WHITE);
-  tft.setTextSize(3);
-  tft.drawString("ESP32 WiFi Demo", 10, 10);
+  tft.setTextSize(1,5);
+  tft.drawString("WIFI FREE", 10, 10);
 
   // --- Khởi động Wi-Fi Station ---
   WiFi.mode(WIFI_AP_STA);  // Vừa STA vừa AP
