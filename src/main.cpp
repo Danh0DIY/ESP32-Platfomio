@@ -8,6 +8,8 @@ BluetoothA2DPSink a2dp_sink;
 #define I2S_DOUT 27   // DIN
 
 void setup() {
+  pinMode(13,OUTPUT);
+  digitalWrite(13,HIGH);
   Serial.begin(115200);
   Serial.println("ESP32 Bluetooth Speaker Starting...");
 
