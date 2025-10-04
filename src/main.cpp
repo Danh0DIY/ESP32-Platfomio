@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "BluetoothA2DPSink.h"
 
 BluetoothA2DPSink a2dp_sink;
