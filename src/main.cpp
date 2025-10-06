@@ -9,10 +9,9 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(3);
   tft.setTextColor(TFT_BLUE, TFT_BLACK);
-  string x = touchRead(33);
-  tft.drawCentreString(x, 120, 120, 3);
 }
 
 void loop() {
-  
+  string chu = touchRead(33);
+  tft.print(chu);
 }
