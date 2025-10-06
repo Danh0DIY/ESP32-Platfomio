@@ -6,16 +6,9 @@ void setup() {
   tft.init();
   tft.setRotation(0);
   tft.fillScreen(TFT_BLACK);
-  for (int x=0; x <=240; x +=60) {
-    for (int y=0; y<=240; y +=60) {
-      tft.fillRect(x, y, 30, 30, TFT_WHITE);
-    }
-  }
-  for (int x=30; x <=240; x +=60) {
-    for (int y=30; y<=240; y +=60) {
-      tft.fillRect(x, y, 30, 30, TFT_WHITE);
-    }
-  }
+  tft.setTextSize(3);
+  int x = touchRead(33);
+  tft.printf(x);
 }
 
 void loop() {
